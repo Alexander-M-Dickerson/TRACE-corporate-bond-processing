@@ -17,7 +17,7 @@ tqdm.pandas()
 df      = pd.read_hdf(r'C:\Users\Alexander\Dropbox\Corporate Bond Interaction Anomalies\1.DATA\TRACEPanelMerged.h5', 'daily')
 df = df[~df['PERMNO'].isnull()]
 CUSIP_Sample = list(df['cusip'].unique() )
-db = wrds.Connection( wrds_username = "gajen" )
+db = wrds.Connection()
 # =============================================================================
 # Yield successive n-sized 
 def divide_chunks(l, n): 		
