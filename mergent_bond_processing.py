@@ -35,6 +35,16 @@ print( FISD_Char.ASSET_BACKED.unique() )
 mask_asset_backed = (FISD_Char.ASSET_BACKED == 'N')
 FISD_Char = FISD_Char[(mask_asset_backed)]
 
+#6: Only U.S Corporate Bonds of specific type (WRDS Bond Module)
+print( FISD_Char.BOND_TYPE.unique() )
+mask_corp = (FISD_Char.BOND_TYPE == 'CCPI') |  (FISD_Char.BOND_TYPE == 'CDEB') |  (FISD_Char.BOND_TYPE == 'CMTN')\
+                                            |  (FISD_Char.BOND_TYPE == 'CMTZ') |  (FISD_Char.BOND_TYPE == 'CP')\
+                                            |  (FISD_Char.BOND_TYPE == 'CZ')   |  (FISD_Char.BOND_TYPE == 'UCID')\
+                                            |  (FISD_Char.BOND_TYPE == 'RNT')  |  (FISD_Char.BOND_TYPE == 'CLOC')\
+                                            |  (FISD_Char.BOND_TYPE == 'CPIK') |  (FISD_Char.BOND_TYPE == 'CUIT')\
+                                            |  (FISD_Char.BOND_TYPE == 'USBN')    
+FISD_Char = FISD_Char[(mask_corp)]
+
 # ============================================================================
 # Now evaluate call options / dummy variable for calls                       #
 # ============================================================================
