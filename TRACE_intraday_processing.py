@@ -11,6 +11,17 @@ import zipfile
 import csv
 import gzip
 
+## ==================================================== ##
+##     Ackowledgements and Contributors                 ##
+## I would like to thank (in no particular order)
+## (1) Lihai Yang (CityUHK) for spotting an error in the
+##  volume-weighting scheme for daily prices.
+## (2) Francis Cong (McGill) for providing me with his
+##     replicated BBW 4-factors.
+## (3) Mathias Buchner (Trafigura) for help with 
+##     vectorizing chunks of Python code.
+## ==================================================== ##
+
 print("BEGIN")
 
 # Requires access to WRDS Cloud #
@@ -219,7 +230,7 @@ for i in range(0,len(cusip_chuncks)):
         prc_EW.columns = ['prc_ew']
         
         # Price - Volume-Weight # 
-        trace['dollar_vol']    = ( trace['ENTRD_VOL_QT'] * trace['RPTD_PR'] ).round(0) # units x clean prc                               
+        trace['dollar_vol']    = ( trace['ENTRD_VOL_QT'] * trace['RPTD_PR']/100 ).round(0) # units x clean prc                               
         trace['value-weights'] = trace.groupby([ 'CUSIP_ID','TRD_EXCTN_DT' ])['dollar_vol'].apply( lambda x: x/np.nansum(x) )
         prc_VW = trace.groupby(['CUSIP_ID','TRD_EXCTN_DT'])['RPTD_PR','value-weights'].apply( lambda x: np.nansum( x['RPTD_PR'] * x['value-weights']) ).to_frame().round(4)
         prc_VW.columns = ['prc_vw']
