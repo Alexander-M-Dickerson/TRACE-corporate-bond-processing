@@ -1,0 +1,29 @@
+This file follows Bai, Bali and Wen (2019) and Dick-Nielsen (2009) to clean the intraday Enhanced TRACE Corporate Bond Database.
+The code is in Python and borrows heavily from Qingyi (Freda) Song Drechsler's SAS code which is available via WRDS here:
+https://wrds-www.wharton.upenn.edu/pages/support/manuals-and-overviews/wrds-bond-return/cleaning-trace-data/wrds-clean-trace-enhanced-file/
+
+There are clear differences, however, between this code and the code (in SAS) that is available on WRDS.
+This code is made publicly available to encourage replicability in empirical asset pricing papers that use the Enhanced TRACE database.
+As such, the output of this code should then be used in conjuction with my other repositories to replicate the BBW 2019 paper (the results cannot be replicated).
+
+This code filters out bonds according to the intraday BBW 2019 filters: See Page 5/24 of the JFE version.
+
+4. Remove bonds that trade under $5 or above $1000
+
+7. For intraday data, we also eliminate bond transactions 
+that are labeled as when-issued, locked-in, or have special 
+sales conditions, and that have more than a twoday settlement.
+
+8. Remove transaction records that are canceled and adjust records that are subsequently corrected or reversed.
+This component explicitly uses the approach opf Dick-Nielsen (2009, 2014)
+
+9. Remove transaction records that have trading volume less than $10,000
+
+The other relavent filters use the Mergent FISD corporate bond database (included in the code).
+
+The file outputs equally-weighted and volume-weighted prices and bond volume in a compressed .csv file.
+
+If you use this code in any of your work / use the correct BBW factors that it produces, please cite:
+Dickerson, Mueller and Robotti (2023), "Priced risk in the cross-section of corporate bonds".
+
+Contact me here for bugs, corrections or questions: a.dickerson@warwick.ac.uk
