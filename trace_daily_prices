@@ -150,7 +150,6 @@ def divide_chunks(l, n):
 		yield l[i:i + n] 
 
 cusip_chunks  = list(divide_chunks(CUSIP_Sample, 500)) 
-cusip_chunks  = cusip_chunks[:5]
 #* ************************************** */
 #* Pre-allocate for Price/Volume          */
 #* ************************************** */ 
