@@ -394,12 +394,12 @@ for i in range(0,len(cusip_chunks)):
         
         # 2.2.1 Sort out all msg_seq_nb;
         w_msg = pre_w[['cusip_id', 'bond_sym_id', 'trd_exctn_dt', 'trd_exctn_tm', 'msg_seq_nb']]
-        w_msg.loc[:,'flag'] = 'msg'
+        w_msg['flag'] = 'msg'
         
         # 2.2.1 Sort out all mapped original msg_seq_nb;
         w_omsg = pre_w[['cusip_id', 'bond_sym_id', 'trd_exctn_dt', 'trd_exctn_tm', 'orig_msg_seq_nb']]
         w_omsg = w_omsg.rename(columns={'orig_msg_seq_nb': 'msg_seq_nb'})
-        w_omsg.loc[:,'flag'] = 'omsg'
+        w_omsg['flag'] = 'omsg'
         
         w = pd.concat([w_omsg, w_msg])
         
