@@ -10,7 +10,7 @@ https://wrds-www.wharton.upenn.edu/pages/support/manuals-and-overviews/wrds-bond
 
 There are clear differences, however, between this code and the code (in SAS) that is available on WRDS.
 This code is made publicly available to encourage replicability in empirical asset pricing papers that use the Enhanced TRACE database.
-As such, the output of this code should then be used in conjuction with my other repositories to replicate the BBW 2019 paper (the results cannot be replicated).
+As such, the output of this code should then be used in conjuction with my other repositories to replicate the BBW 2019 paper.
 
 Intraday Filtering:
 This code filters out bonds according to the intraday BBW 2019 filters: See Page 5/24 of the JFE version.
