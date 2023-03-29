@@ -1,6 +1,6 @@
 This repository follows Bai, Bali and Wen (2019) and Dick-Nielsen (2009) to clean the intraday Enhanced TRACE Corporate Bond Database, compute bond accrued interest, 
 bond full price and other bond characteristics. The final part of the repository replicates the BBW 4-Factor model using the processed Enhanced TRACE data.
-The script files start by processing the bond data from itnraday -> daily.
+The script files start by processing the bond data from intraday -> daily.
 Thereafter, bond accrued interest and the dirty price is computed on each and every day there is a valid bond trade.
 From then then on, script files are provided to compute bond amount outstanding , bond rating and the other necessary bond characteristics which
 are required as inputs to the BBW 4-Factor model (95% VaR, and the ILLIQ proxy from "The Illiquidity of Corporate Bonds" by Bao, Pan, and Wang, 2011).
