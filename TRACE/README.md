@@ -21,5 +21,5 @@ Moreover, it is designed to cater to both pre and post the 2012/02/06 change in 
 
 2. Update and install the required packages.
 
-3. Run ```pip install pandas'''
+3. Run ```pip install pandas```
 
