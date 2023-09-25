@@ -1,36 +1,17 @@
-This repository follows Bai, Bali and Wen (2019) and Dick-Nielsen (2009) to clean the intraday Enhanced TRACE Corporate Bond Database, compute bond accrued interest, 
-bond full price and other bond characteristics. The final part of the repository replicates the BBW 4-Factor model using the processed Enhanced TRACE data.
-The script files start by processing the bond data from intraday -> daily.
-Thereafter, bond accrued interest and the dirty price is computed on each and every day there is a valid bond trade.
-From then then on, script files are provided to compute bond amount outstanding , bond rating and the other necessary bond characteristics which
-are required as inputs to the BBW 4-Factor model (95% VaR, and the ILLIQ proxy from "The Illiquidity of Corporate Bonds" by Bao, Pan, and Wang, 2011).
+# Cleaning and Processing TRACE Data
 
-The code is in Python and borrows heavily from Qingyi (Freda) Song Drechsler's SAS code which is available via WRDS here:
-https://wrds-www.wharton.upenn.edu/pages/support/manuals-and-overviews/wrds-bond-return/cleaning-trace-data/wrds-clean-trace-enhanced-file/
+## Overview
 
-There are clear differences, however, between this code and the code (in SAS) that is available on WRDS.
-This code is made publicly available to encourage replicability in empirical asset pricing papers that use the Enhanced TRACE database.
-As such, the output of this code should then be used in conjuction with my other repositories to replicate the BBW 2019 paper.
+This Python repository contains script files (which are continuously updated with best practices), to process the Enhanced TRACE data.
+The core repositories are as listed below.
 
-Intraday Filtering:
-This code filters out bonds according to the intraday BBW 2019 filters: See Page 5/24 of the JFE version.
+# WRDS
+Files to handle the pre-processed WRDS TRACE data, available from https://wrds-www.wharton.upenn.edu/pages/get-data/wrds-bond-returns/wrds-bond-returns/
 
-4. Remove bonds that trade under $5 or above $1000
+# TRACE
+Files to process (yourself) the intraday, daily and the nmonthly Enhanced TRACE bond data.
 
-7. For intraday data, we also eliminate bond transactions 
-that are labeled as when-issued, locked-in, or have special 
-sales conditions, and that have more than a twoday settlement.
-
-8. Remove transaction records that are canceled and adjust records that are subsequently corrected or reversed.
-This component explicitly uses the approach opf Dick-Nielsen (2009, 2014)
-
-9. Remove transaction records that have trading volume less than $10,000
-
-The other relavent filters use the Mergent FISD corporate bond database (included in the code).
-
-The file outputs equally-weighted and volume-weighted prices and bond volume in a compressed .csv file.
-
-If you use this code in any of your work / use the correct BBW factors that it produces, please cite:
-Dickerson, Mueller and Robotti (2023), "Priced risk in the cross-section of corporate bonds".
+# NOISE 
+Files to properly handle the market microstructure noise inherent in the Enhanced TRACE transaction data from our new paper: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4575879
 
 Contact me here for bugs, corrections or questions: a.dickerson@warwick.ac.uk
