@@ -7,6 +7,7 @@ The cleaning procedure is largely based on the discussions presented in the work
 as well as Bai, Bali, and Wen (2019). The script effectively handles Cancellation, Correction, Reversal, and Double entries in the daily data.
 Moreover, it is designed to cater to both pre and post the 2012/02/06 change in the Trace System.
 Thereafter, several scripts are available to create the monthly bond-level panel which variables included such as bond returns, credit spreads and others.
+We strongly recomend you use the pre-processed data by the WRDS data science team available here: https://wrds-www.wharton.upenn.edu/pages/get-data/wrds-bond-returns/wrds-bond-returns/ and use this repository to complement their data offering with liquidity metrics and credit spreads.
 
 ## Requirements
 
@@ -24,12 +25,15 @@ A. Ensure you have Python installed on your system. If not, you can download it 
 B. Update and install the required packages.
 
 Run these scripts sequentially to produce the TRACE bond-level panel.
+Note that we continuously re-evaluate the code based on feedback, comments and suggestions. We denote the updated files by _v2, _v3 and so on.
+You can always find the most updated factors on the https://openbondassetpricing.com/data/ website.
+In most cases, the change in the output is extremely minor. But the primary reason for this repository is to make things better for empirical asset pricing in bonds.
 
 1. Run ```MakeIntra_Daily.py```. This script outputs the daily bond-level panel with clean prices, and volumes.
 
-2. Run ```MakeBondDailyMetrics.py```. This script outputs the daily bond accrued interest, dirty prices, duration, convexity and yields.
+2. Run ```MakeBondDailyMetrics.py``` or ```MakeBondDailyMetrics_v2.py```. This script outputs the daily bond accrued interest, dirty prices, duration, convexity and yields.
 
-3. Run ```MakeBondMonthlyMetrics.py```. This script outputs the monthly bond returns, excess returns, bond yields, duration and convexity.
+3. Run ```MakeBondMonthlyMetrics.py``` or ```MakeBondMonthlyMetrics_v2.py```. This script outputs the monthly bond returns, excess returns, bond yields, duration and convexity.
 
 4. Run ```MakeCreditSpreads.py```. This script estimates monthly bond credit spreads.
 
