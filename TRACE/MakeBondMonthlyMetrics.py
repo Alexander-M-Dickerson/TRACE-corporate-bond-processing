@@ -49,6 +49,9 @@ tqdm.pandas()
 #* ************************************** */ 
 # We start off by loading the daily price, AI volume and yield file
 # This is the output from the script file: "MakeBondDailyMetrics.py"
+# or "MakeBondDailyMetrics_2.py"
+# Change below to 'DirtyPrices.csv.gzip' for v2 (recomended)
+
 PriceC = \
 pd.read_csv\
     (r'~\AI_Yield_BBW_TRACE_Enhanced_Dick_Nielsen.csv.gzip', 
