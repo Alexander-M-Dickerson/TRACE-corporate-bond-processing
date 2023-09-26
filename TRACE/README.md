@@ -37,7 +37,7 @@ Run these scripts sequentially to produce the TRACE bond-level panel.
 
 6. Run ```MakeRatings.py``` and ```MakeAmountOutstanding.py``` in any order. This script downloads bond ratings and bond amount outstanding.
 
-7. Run ```MakeDataBaseTRACE.py```This script downloads the data processed in the prior scripts and generates the final database.
+7. Run ```MakeDataBaseTRACE.py```This script downloads the data processed in the prior scripts and generates the final database. Updated with new/better bond ratings merge.
 
 ## Acknowledgements
 
