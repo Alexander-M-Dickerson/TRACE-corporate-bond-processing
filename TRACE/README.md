@@ -29,7 +29,7 @@ Run these scripts sequentially to produce the TRACE bond-level panel.
 
 2. Run ```MakeBondDailyMetrics.py```. This script outputs the daily bond accrued interest, dirty prices, duration, convexity and yields.
 
-3. Run ```MakeBondDailyMetrics.py```. This script outputs the monthly bond returns, excess returns, bond yields, duration and convexity.
+3. Run ```MakeBondMonthlyMetrics.py```. This script outputs the monthly bond returns, excess returns, bond yields, duration and convexity.
 
 4. Run ```MakeCreditSpreads.py```. This script estimates monthly bond credit spreads.
 
