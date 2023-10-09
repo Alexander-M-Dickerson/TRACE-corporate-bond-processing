@@ -35,6 +35,10 @@ df = pd.read_csv('WRDS_MMN_Corrected_Data.csv.gzip',
                  compression = 'gzip')
 df['date'] = pd.to_datetime(df['date'])
 
+df    = df[df.tmt > 1.0]
+df    = df[~df.rating.isnull()]
+df    = df.sort_values(['cusip','date'])
+
 # Load some factors      #
 _url = 'https://openbondassetpricing.com/wp-content/uploads/2023/10/bbw_wrds_oct_2023_lastest.csv'
 dfF  = pd.read_csv(_url)[['date','MKTB']]
@@ -63,6 +67,7 @@ tnw = 12 # t-stats with 12-Lags
 
 AveRetExport          = pd.DataFrame()
 AlphaExport           = pd.DataFrame()
+NumNulls              = pd.DataFrame()
 
 for i,s in enumerate(cols):
     print(s)
@@ -146,4 +151,11 @@ for i,s in enumerate(cols):
     
     AveRetExport  =  pd.concat([AveRetExport , AveRet], axis = 0)
     AlphaExport   =  pd.concat([AlphaExport  , Alpha],  axis = 0)
+
+    ##### Count Nulls  #####
+    ########################
+    Nulls       = pd.DataFrame( sorts.isnull().sum()).T
+    Nulls.index = [s]
+    NumNulls    =  pd.concat([NumNulls , Nulls],
+                           axis = 0)
 # =============================================================================
