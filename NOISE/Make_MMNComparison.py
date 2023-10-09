@@ -42,7 +42,7 @@ df    = df.sort_values(['cusip','date'])
 # Load some factors      #
 _url = 'https://openbondassetpricing.com/wp-content/uploads/2023/10/bbw_wrds_oct_2023_lastest.csv'
 dfF  = pd.read_csv(_url)[['date','MKTB']]
-dfF['date'] = pd.to_datetime(dfF['date'], format = "%d/%m/%Y")
+dfF['date'] = pd.to_datetime(dfF['date'])
 dfF  = dfF.set_index(['date'])
 
 yy = 'exretn_t+1'    # One-month ahead bond return #
