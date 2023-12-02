@@ -1,15 +1,14 @@
 ##########################################
-# BBW (2019) Enhanced TRACE Data Process #
+# Enhanced TRACE Data Proces             #
 # Part (ii): Dirty Prices, AI & Yields   #
 # Compute Accrued Interest, Dirty Prices,#
 # Bond Duration, Convexity & Yield       #
 # Alexander Dickerson                    #
 # Email: a.dickerson@warwick.ac.uk       #
-# Date: January 2023                     #
-# Updated:  July 2023                    #
-# Version:  1.0.1                        #
+# Date: December 2023                    #
+# Updated:  December 2023                #
+# Version:  3.0.0                        #
 ##########################################
-
 
 ##########################################
 # I ackowledge                           #
@@ -27,6 +26,13 @@
 # of which the majority remains "as is". #
 # Francis' GitHub page is available here:#
 # https://github.com/flcong              #
+##########################################
+# Thanks to Zhiyao (Nicholas) Chen for   #
+# pointing out data errors in the FISD   #
+# princimal amounts and our assumptions  #
+# regarding semi-annual compounding.     #
+# See his webpage here:                  #
+# https://sites.google.com/site/nicholaszhiyaochen/    
 ##########################################
 
 
@@ -123,7 +129,7 @@ fisd_issue = db.raw_sql("""SELECT complete_cusip, issue_id,
                   bond_type,private_placement,
                   interest_frequency,dated_date,
                   day_count_basis,offering_date,
-                  offering_amt, maturity
+                  offering_amt, maturity, principal_amt
                   FROM fisd.fisd_mergedissue  
                   """)
                   
@@ -216,7 +222,7 @@ traced.rename(columns={'cusip_id':'cusip'}, inplace=True)
 traced = traced.merge(
     fisd[['cusip', 'offering_date', 'dated_date', 
            'interest_frequency', 'coupon', 'day_count_basis',
-           'coupon_type','maturity']],
+           'coupon_type','maturity','principal_amt']],
     left_on='cusip',
     right_on='cusip',
     how='left'
@@ -234,6 +240,90 @@ traced['interest_frequency'] = traced['interest_frequency'].astype(str)
 #* ************************************** */ 
 traced.rename(columns={'prc_vw':'pr',}, inplace=True)
 traced.rename(columns={'cusip':'cusip_id',}, inplace=True)
+
+#### Remove -ve prices ####
+Desc   = traced['pr'].describe().round(3)
+traced = traced[traced['pr'] > 0 ]
+traced['pr'].min()
+
+#* ************************************** */
+#* Par (Principal Amount) Data Errors     */
+#* ************************************** */
+
+# Thanks to Zhiyao (Nicholas) Chen from:
+# Lingnan University, Hong Kong for bringing up
+# these issues #
+
+# First, note that not all par values are 1,000 USD
+# i.e., 100% of par 
+traced['principal_amt'].value_counts(normalize = True)*100
+
+# Examine "non-1000" par value bonds #
+tracednon = traced[traced['principal_amt'] != 1000]
+tracednon['principal_amt'].value_counts(normalize = True)*100
+
+# Most have a par value of 10, 5000 and 2000
+
+# Step 1: I do not have enough manpower to manually
+# inspect all of these non-1000 par bonds
+# ----> Only keep bonds with par of 1000, 10, 5000, 2000
+# i.e. those which are most frequent #
+par_mask = ((traced.principal_amt == 1000) |\
+            (traced.principal_amt == 10)   |\
+            (traced.principal_amt == 5000) |\
+            (traced.principal_amt == 2000)  )
+traced = traced[par_mask]
+
+# Step 2: $10 Par Bonds Inspection
+tracednon10 = traced[traced['principal_amt'] == 10]
+
+# Examine pricing
+tracednon10.groupby("interest_frequency")['pr'].mean()
+tracednon10.groupby("interest_frequency")['coupon'].mean()
+tracednon10.groupby("interest_frequency")['pr'].count()
+
+# Examine all bonds without semi-annual coupons
+tracednon10_semi = tracednon10[tracednon10["interest_frequency"] != '2']
+tracednon10_semi.groupby("interest_frequency")['pr'].mean()
+tracednon10_semi.groupby("interest_frequency")['pr'].count()
+
+# All bond except those with frequency == 2 have prices which correctly match
+# there par values (10)
+# Step 2.1: Scale all bonds (par==10) whose int_freq != 2 to be in 100 range 
+# Note: Coupons (if any) can remain as is / they seem correct
+mask_scale = ( (traced.principal_amt      == 10)&\
+               (traced.interest_frequency != '2') )
+traced.loc[mask_scale, 'prc_ew'] = traced.loc[mask_scale, 'prc_ew'] * 10
+traced.loc[mask_scale, 'pr']     = traced.loc[mask_scale, 'pr']     * 10
+
+# Outcome, all of the par == 10 bonds have correctly scaled prices #
+
+# Step 3: Par values of $5000
+tracednon5 = traced[traced['principal_amt'] == 5000]
+
+# Examine pricing
+tracednon5.groupby("interest_frequency")['pr'].mean()
+tracednon5.groupby("interest_frequency")['coupon'].mean()
+tracednon5.groupby("interest_frequency")['pr'].count()
+
+# Can leave the prices unchanged
+
+# Step 4: Par values of $2000
+tracednon2 = traced[traced['principal_amt'] == 2000]
+
+# Examine pricing
+tracednon2.groupby("interest_frequency")['pr'].mean()
+tracednon2.groupby("interest_frequency")['pr'].count()
+
+# Can leave the prices unchanged
+
+# Check #
+traced['principal_amt'].value_counts(normalize = True)*100
+traced.groupby("interest_frequency")['pr'].mean()
+traced.groupby(["principal_amt","interest_frequency"])['pr'].mean()
+
+# All prices look reasonable #
+
 #* ************************************** */
 #* Functions                              */
 #* ************************************** */ 
@@ -324,6 +414,13 @@ def GetNewVarsPy(x):
         )
     else:
         bond = None
+    
+    # Ifelse for the coupon #
+    if x.coupon_type == 'Z' or (x.coupon_type == 'F'
+                                and (x.coupon == 0 or np.isnan(x.coupon))
+                                and MktCleanPrice < 100):
+        InterestFrequency = ql.Annual
+    
     # Get result
     if bond is not None and sttldt < x.maturity \
             and np.isfinite(MktCleanPrice):
@@ -336,12 +433,22 @@ def GetNewVarsPy(x):
                 ql.Semiannual,
                 SettlementDate
             )
+            
+            # Yield to maturity -- True
+            ytmt= bond.bondYield(
+                MktCleanPrice,
+                DayCountBasis,
+                ql.Compounded,
+                InterestFrequency,
+                SettlementDate
+            )
+            
             # Clean price
             prclean = bond.cleanPrice(
                 ytm,
                 DayCountBasis,
                 ql.Compounded,
-                ql.Semiannual,
+                InterestFrequency,
                 SettlementDate
             )
             # Dirty price
@@ -349,7 +456,7 @@ def GetNewVarsPy(x):
                 ytm,
                 DayCountBasis,
                 ql.Compounded,
-                ql.Semiannual,
+                InterestFrequency,
                 SettlementDate
             )
             
@@ -359,7 +466,7 @@ def GetNewVarsPy(x):
                                       ytm,
                                       DayCountBasis,
                                       ql.Compounded,  
-                                      ql.Semiannual,
+                                      InterestFrequency,
                                       ql.Duration.Modified,
                                       SettlementDate
                                       )
@@ -370,7 +477,7 @@ def GetNewVarsPy(x):
                                       ytm,
                                       DayCountBasis,
                                       ql.Compounded,  
-                                      ql.Semiannual,                                    
+                                      InterestFrequency,                                    
                                       SettlementDate
                                       )
                      
@@ -385,6 +492,7 @@ def GetNewVarsPy(x):
                                                                     
         except RuntimeError:
             ytm = np.nan
+            ytmt= np.nan
             prfull = np.nan
             prclean = np.nan
             acclast = np.nan
@@ -394,6 +502,7 @@ def GetNewVarsPy(x):
             conv_bond = np.nan
     else:
         ytm = np.nan
+        ytmt= np.nan
         prclean = np.nan
         prfull = np.nan
         acclast = np.nan
@@ -404,7 +513,7 @@ def GetNewVarsPy(x):
         
     return (
         x.cusip_id, x.trd_exctn_dt, sttldt, x.pr, prclean, prfull,
-        acclast, accpmt, accall, ytm, x.qvolume, x.dvolume, x.offering_date,
+        acclast, accpmt, accall, ytm,ytmt, x.qvolume, x.dvolume, x.offering_date,
         x.coupon, x.maturity, x.day_count_basis, x.interest_frequency,
         dur_bond, conv_bond
         )
@@ -417,7 +526,7 @@ traced = pd.DataFrame(
     Parallel(n_jobs=14)(delayed(GetNewVarsPy)(x)
                        for x in tqdm(traced.itertuples(index=False))),
     columns=['cusip_id', 'trd_exctn_dt', 'sttldt', 'pr', 'prclean', 'prfull',
-             'acclast', 'accpmt', 'accall', 'ytm', 'qvolume','dvolume','offering_date',
+             'acclast', 'accpmt', 'accall', 'ytm','ytmt', 'qvolume','dvolume','offering_date',
              'coupon', 'maturity', 'day_count_basis', 'interest_frequency',
              'mod_dur','convexity']
     )
@@ -425,6 +534,6 @@ traced = pd.DataFrame(
 #* ************************************** */
 #* Export to file                         */
 #* ************************************** */ 
-traced.to_csv(r'~\AI_Yield_BBW_TRACE_Enhanced_Dick_Nielsen.csv.gzip' ,
-              compression='gzip')  
+traced.to_csv(r'DirtyPrices.csv.gzip' ,
+              compression='gzip')   
 # =============================================================================      
