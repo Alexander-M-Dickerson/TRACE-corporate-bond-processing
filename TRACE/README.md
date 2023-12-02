@@ -48,3 +48,5 @@ In most cases, the change in the output is extremely minor. But the primary reas
 1. Matthias Buchner (Trafigura)
 2. Francis Cong (Morgan Stanley)
 3. Mihai Mihut (Tilburg)
+4. Zhiyao (Nicholas) Chen (Lingnan University)
+   
